@@ -1,12 +1,24 @@
-# TrollStore TV Tools
+<p align="center">
+  <img src="docs/assets/trollstore-tv-tools-banner.png" width="100%" alt="TrollStore TV Tools — BYOIPA 打包、CoreTrust 批量签名与冷重启验收工具箱" />
+</p>
 
-[![CI](https://github.com/comicchang/trollstore-tv-tools/actions/workflows/ci.yml/badge.svg)](https://github.com/comicchang/trollstore-tv-tools/actions/workflows/ci.yml)
-![Platform](https://img.shields.io/badge/platform-macOS%20%E2%86%92%20tvOS%2017.0-blue)
-![License](https://img.shields.io/badge/license-MIT-green)
+<h1 align="center">TrollStore TV Tools</h1>
 
-[English](README.md) | **简体中文**
+<p align="center">
+  <a href="https://github.com/comicchang/trollstore-tv-tools/actions/workflows/ci.yml"><img src="https://github.com/comicchang/trollstore-tv-tools/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
+  <img src="https://img.shields.io/badge/platform-macOS%20%E2%86%92%20tvOS%2017.0-blue" alt="Platform" />
+  <img src="https://img.shields.io/badge/license-MIT-green" alt="License" />
+</p>
 
-面向 **Apple TV 4K（`AppleTV14,1` / tvOS 17.0 `21J354`）** 的宿主机 **CoreTrust 批量签名**、**干净室 tvOS 诊断探针** 与 **冷重启后验收工具箱**。
+<p align="center">
+  <a href="README.md">English</a> · <strong>简体中文</strong> · <a href="#全部脚本使用说明">脚本手册</a> · <a href="docs/APP-PACKAGING-GUIDE.zh-CN.md">BYOIPA 打包指南</a> · <a href="ROADMAP.md">路线图</a>
+</p>
+
+面向 **Apple TV 4K（`AppleTV14,1` / tvOS 17.0 `21J354`）** 的宿主机 **BYOIPA 应用打包**、**CoreTrust 批量签名**、**干净室 tvOS 诊断探针** 与 **冷重启后验收工具箱**。
+
+<p align="center">
+  <img src="docs/assets/architecture-overview.svg" width="100%" alt="TrollStore TV Tools 工作流架构图" />
+</p>
 
 > 如需 Apple TV 端永久签名安装器本体，请见 **[`trollstore-tv`](https://github.com/comicchang/trollstore-tv)**（tvOS 17.0 CoreTrust 冷重启免越狱存活）或 **[`trollstore-lite-tv`](https://github.com/comicchang/trollstore-lite-tv)**（任意已越狱 tvOS 17.x+，带 `:8787` 网页商店与离线油猴托管）。
 

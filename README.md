@@ -1,12 +1,24 @@
-# TrollStore TV Tools
+<p align="center">
+  <img src="docs/assets/trollstore-tv-tools-banner.png" width="100%" alt="TrollStore TV Tools — BYOIPA Packaging, CoreTrust Signer &amp; Reboot Verification" />
+</p>
 
-[![CI](https://github.com/comicchang/trollstore-tv-tools/actions/workflows/ci.yml/badge.svg)](https://github.com/comicchang/trollstore-tv-tools/actions/workflows/ci.yml)
-![Platform](https://img.shields.io/badge/platform-macOS%20%E2%86%92%20tvOS%2017.0-blue)
-![License](https://img.shields.io/badge/license-MIT-green)
+<h1 align="center">TrollStore TV Tools</h1>
 
-**English** | [简体中文](README.zh-CN.md)
+<p align="center">
+  <a href="https://github.com/comicchang/trollstore-tv-tools/actions/workflows/ci.yml"><img src="https://github.com/comicchang/trollstore-tv-tools/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
+  <img src="https://img.shields.io/badge/platform-macOS%20%E2%86%92%20tvOS%2017.0-blue" alt="Platform" />
+  <img src="https://img.shields.io/badge/license-MIT-green" alt="License" />
+</p>
 
-Companion host-side **CoreTrust signing**, **clean-room tvOS probe**, and **post-reboot verification** toolkit for **Apple TV 4K (`AppleTV14,1`, tvOS 17.0 / `21J354`)**.
+<p align="center">
+  <strong>English</strong> · <a href="README.zh-CN.md">简体中文</a> · <a href="#script-usage-reference">Scripts</a> · <a href="docs/APP-PACKAGING-GUIDE.md">BYOIPA Guide</a> · <a href="ROADMAP.md">Roadmap</a>
+</p>
+
+Companion host-side **BYOIPA packaging**, **CoreTrust batch signing**, **clean-room tvOS probe**, and **post-reboot verification** toolkit for **Apple TV 4K (`AppleTV14,1`, tvOS 17.0 / `21J354`)**.
+
+<p align="center">
+  <img src="docs/assets/architecture-overview.svg" width="100%" alt="TrollStore TV Tools Workflow Architecture" />
+</p>
 
 > Looking for the on-device permasigned IPA installer itself (`TrollStore.app` + `trollstorehelper`)? See **[`trollstore-tv`](https://github.com/comicchang/trollstore-tv)** (tvOS 17.0 CoreTrust cold-reboot survival) or **[`trollstore-lite-tv`](https://github.com/comicchang/trollstore-lite-tv)** (jailbroken tvOS 17.x+ trustcache installer with `:8787` web store).
 
