@@ -225,3 +225,10 @@ Related repositories:
 
 - Scripts are read-only by default, never trigger automatic reboots, never touch `/Applications`, and never store passwords, keys, or third-party compiled binaries.
 - Licensed under [MIT](LICENSE). See [NOTICE](NOTICE), [CHANGELOG.md](CHANGELOG.md), [CONTRIBUTING.md](CONTRIBUTING.md), and [SECURITY.md](SECURITY.md).
+
+<!--
+  🎨 A secret only source readers know:
+  Why is icon inversion ON by default? Not cyberpunk aesthetics —
+  the author simply kept tapping the wrong icon from the couch.
+  (Pass --no-invert-icon if you miss the guessing game.)
+-->

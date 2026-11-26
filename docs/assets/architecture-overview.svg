@@ -19,80 +19,81 @@
   <rect width="1200" height="540" rx="18" fill="url(#bg2)" stroke="#1f2937" stroke-width="2"/>
 
   <!-- Header -->
-  <text x="40" y="48" fill="#f9fafb" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif" font-size="24" font-weight="700">TrollStore TV Tools — BYOIPA Packaging, Signing &amp; Verification Pipelines</text>
-  <text x="40" y="74" fill="#9ca3af" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif" font-size="14">Pure MIT Host Toolkit · Zero Proprietary IPAs / DRM Code · Read-Only Verification Defaults · CI Verified</text>
+  <text x="40" y="48" fill="#f9fafb" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif" font-size="23" font-weight="700">TrollStore TV Tools — BYOIPA Packaging, Signing &amp; Verification Pipelines</text>
+  <text x="40" y="74" fill="#9ca3af" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif" font-size="13.5">Pure MIT Host Toolkit · Zero Proprietary IPAs / DRM Code · Read-Only Verification Defaults · CI Verified</text>
   <rect x="40" y="88" width="1120" height="2" fill="url(#accent2)" opacity="0.6"/>
 
-  <!-- Left Column: Inputs -->
-  <rect x="40" y="114" width="275" height="316" rx="14" fill="#0f172a" stroke="#1e293b"/>
-  <rect x="40" y="114" width="275" height="36" rx="14" fill="#1e293b"/>
-  <text x="58" y="137" fill="#38bdf8" font-family="ui-monospace,monospace" font-size="12.5" font-weight="700">USER-SUPPLIED INPUTS</text>
+  <!-- Left Column: Inputs (x=40..280, w=240, inner=56..264 w=208) -->
+  <rect x="40" y="114" width="240" height="316" rx="14" fill="#0f172a" stroke="#1e293b"/>
+  <rect x="40" y="114" width="240" height="36" rx="14" fill="#1e293b"/>
+  <text x="56" y="137" fill="#38bdf8" font-family="ui-monospace,monospace" font-size="12" font-weight="700">USER-SUPPLIED INPUTS</text>
 
-  <rect x="58" y="166" width="239" height="68" rx="10" fill="#111827" stroke="#334155"/>
-  <text x="72" y="189" fill="#f3f4f6" font-family="-apple-system,sans-serif" font-size="13.5" font-weight="600">Open-Source .deb</text>
-  <text x="72" y="210" fill="#94a3b8" font-family="ui-monospace,monospace" font-size="11.5">e.g. Kodi tvOS (GPL-2.0+)</text>
+  <rect x="56" y="166" width="208" height="68" rx="10" fill="#111827" stroke="#334155"/>
+  <text x="70" y="189" fill="#f3f4f6" font-family="-apple-system,sans-serif" font-size="13" font-weight="600">Open-Source .deb</text>
+  <text x="70" y="210" fill="#94a3b8" font-family="ui-monospace,monospace" font-size="10.5">e.g. Kodi tvOS (GPL-2.0+)</text>
 
-  <rect x="58" y="248" width="239" height="78" rx="10" fill="#111827" stroke="#334155"/>
-  <text x="72" y="271" fill="#f3f4f6" font-family="-apple-system,sans-serif" font-size="13.5" font-weight="600">Local Decrypted IPA</text>
-  <text x="72" y="292" fill="#94a3b8" font-family="ui-monospace,monospace" font-size="11.5">BYOIPA (cryptid == 0)</text>
-  <text x="72" y="310" fill="#94a3b8" font-family="ui-monospace,monospace" font-size="11.5">Obtained by user locally</text>
+  <rect x="56" y="248" width="208" height="78" rx="10" fill="#111827" stroke="#334155"/>
+  <text x="70" y="271" fill="#f3f4f6" font-family="-apple-system,sans-serif" font-size="13" font-weight="600">Local Decrypted IPA</text>
+  <text x="70" y="292" fill="#94a3b8" font-family="ui-monospace,monospace" font-size="10.5">BYOIPA (cryptid == 0)</text>
+  <text x="70" y="310" fill="#94a3b8" font-family="ui-monospace,monospace" font-size="10.5">Supplied locally by user</text>
 
-  <rect x="58" y="340" width="239" height="72" rx="10" fill="#111827" stroke="#334155"/>
-  <text x="72" y="363" fill="#f3f4f6" font-family="-apple-system,sans-serif" font-size="13.5" font-weight="600">Clean-Room Probe Src</text>
-  <text x="72" y="384" fill="#94a3b8" font-family="ui-monospace,monospace" font-size="11.5">src/probe (Demo + ProbeKit)</text>
+  <rect x="56" y="340" width="208" height="72" rx="10" fill="#111827" stroke="#334155"/>
+  <text x="70" y="363" fill="#f3f4f6" font-family="-apple-system,sans-serif" font-size="13" font-weight="600">Clean-Room Probe Src</text>
+  <text x="70" y="384" fill="#94a3b8" font-family="ui-monospace,monospace" font-size="10.5">src/probe (Demo+ProbeKit)</text>
 
-  <!-- Middle Column: Scripts -->
-  <rect x="360" y="114" width="445" height="316" rx="14" fill="#0f172a" stroke="#38bdf8" stroke-opacity="0.5"/>
-  <rect x="360" y="114" width="445" height="36" rx="14" fill="#1e293b"/>
-  <text x="378" y="137" fill="#38bdf8" font-family="ui-monospace,monospace" font-size="12.5" font-weight="700">HOST-SIDE SCRIPTS (MACOS / LINUX)</text>
+  <!-- Middle Column: Scripts (x=316..846, w=530, inner=332..830 w=498) -->
+  <rect x="316" y="114" width="530" height="316" rx="14" fill="#0f172a" stroke="#38bdf8" stroke-opacity="0.5"/>
+  <rect x="316" y="114" width="530" height="36" rx="14" fill="#1e293b"/>
+  <text x="332" y="137" fill="#38bdf8" font-family="ui-monospace,monospace" font-size="12" font-weight="700">HOST-SIDE SCRIPTS (MACOS / LINUX)</text>
 
-  <rect x="378" y="166" width="409" height="54" rx="10" fill="#111827" stroke="#334155"/>
-  <text x="392" y="188" fill="#f3f4f6" font-family="ui-monospace,monospace" font-size="13" font-weight="700">deb2ipa.sh</text>
-  <text x="392" y="207" fill="#94a3b8" font-family="-apple-system,sans-serif" font-size="12">Extract /Applications/*.app · strip .jbroot · zero-compress --store</text>
+  <rect x="332" y="166" width="498" height="54" rx="10" fill="#111827" stroke="#334155"/>
+  <text x="346" y="188" fill="#f3f4f6" font-family="ui-monospace,monospace" font-size="12.5" font-weight="700">deb2ipa.sh</text>
+  <text x="346" y="207" fill="#94a3b8" font-family="-apple-system,sans-serif" font-size="11.5">Extract /Applications/*.app · strip .jbroot · zero-compress --store</text>
 
-  <rect x="378" y="232" width="409" height="62" rx="10" fill="#111827" stroke="#334155"/>
-  <text x="392" y="254" fill="#f3f4f6" font-family="ui-monospace,monospace" font-size="13" font-weight="700">build-youtube-tvos.sh + repack-ipa.sh + invert-tvos-icon.sh</text>
-  <text x="392" y="274" fill="#94a3b8" font-family="-apple-system,sans-serif" font-size="12">cobalt-patcher + RGBA8 icon invert (default ON; --no-invert-icon) + sandbox</text>
+  <rect x="332" y="232" width="498" height="62" rx="10" fill="#111827" stroke="#334155"/>
+  <text x="346" y="254" fill="#f3f4f6" font-family="ui-monospace,monospace" font-size="12" font-weight="700">build-youtube-tvos.sh + repack-ipa.sh + invert-tvos-icon.sh</text>
+  <text x="346" y="274" fill="#94a3b8" font-family="-apple-system,sans-serif" font-size="11">cobalt-patcher + RGBA8 icon invert (default ON; --no-invert-icon) + sandbox</text>
 
-  <rect x="378" y="306" width="409" height="52" rx="10" fill="#111827" stroke="#334155"/>
-  <text x="392" y="328" fill="#f3f4f6" font-family="ui-monospace,monospace" font-size="13" font-weight="700">fetch-fastpathsign.sh + sign-coretrust.sh</text>
-  <text x="392" y="346" fill="#94a3b8" font-family="-apple-system,sans-serif" font-size="12">Recursive Mach-O + nested .appex per-bundle ent + symlink &amp; cryptid guards</text>
+  <rect x="332" y="306" width="498" height="52" rx="10" fill="#111827" stroke="#334155"/>
+  <text x="346" y="328" fill="#f3f4f6" font-family="ui-monospace,monospace" font-size="12" font-weight="700">fetch-fastpathsign.sh + sign-coretrust.sh</text>
+  <text x="346" y="346" fill="#94a3b8" font-family="-apple-system,sans-serif" font-size="11.5">Recursive Mach-O + nested .appex per-bundle ent + symlink &amp; cryptid checks</text>
 
-  <rect x="378" y="370" width="409" height="44" rx="10" fill="#111827" stroke="#334155"/>
-  <text x="392" y="397" fill="#34d399" font-family="ui-monospace,monospace" font-size="12.5" font-weight="700">build-probe.sh · install-probe.sh · stage2-verify.sh</text>
+  <rect x="332" y="370" width="498" height="44" rx="10" fill="#111827" stroke="#334155"/>
+  <text x="346" y="397" fill="#34d399" font-family="ui-monospace,monospace" font-size="12" font-weight="700">build-probe.sh · install-probe.sh · stage2-verify.sh</text>
 
   <!-- Arrows Left -> Mid -->
-  <line x1="315" y1="196" x2="354" y2="196" stroke="#38bdf8" stroke-width="2" marker-end="url(#arr)"/>
-  <line x1="315" y1="274" x2="354" y2="274" stroke="#38bdf8" stroke-width="2" marker-end="url(#arr)"/>
-  <line x1="315" y1="388" x2="354" y2="388" stroke="#38bdf8" stroke-width="2" marker-end="url(#arr)"/>
+  <line x1="280" y1="196" x2="310" y2="196" stroke="#38bdf8" stroke-width="2" marker-end="url(#arr)"/>
+  <line x1="280" y1="274" x2="310" y2="274" stroke="#38bdf8" stroke-width="2" marker-end="url(#arr)"/>
+  <line x1="280" y1="388" x2="310" y2="388" stroke="#38bdf8" stroke-width="2" marker-end="url(#arr)"/>
 
-  <!-- Right Column: Outputs & Verification -->
-  <rect x="850" y="114" width="310" height="316" rx="14" fill="#0f172a" stroke="#065f46"/>
-  <rect x="850" y="114" width="310" height="36" rx="14" fill="#064e3b"/>
-  <text x="868" y="137" fill="#34d399" font-family="ui-monospace,monospace" font-size="12.5" font-weight="700">OUTPUTS &amp; TARGET</text>
+  <!-- Right Column: Outputs & Verification (x=882..1160, w=278, inner=898..1144 w=246) -->
+  <rect x="882" y="114" width="278" height="316" rx="14" fill="#0f172a" stroke="#065f46"/>
+  <rect x="882" y="114" width="278" height="36" rx="14" fill="#064e3b"/>
+  <text x="898" y="137" fill="#34d399" font-family="ui-monospace,monospace" font-size="12" font-weight="700">OUTPUTS &amp; TARGET</text>
 
-  <rect x="868" y="166" width="274" height="74" rx="10" fill="#111827" stroke="#10b981" stroke-opacity="0.5"/>
-  <text x="882" y="189" fill="#34d399" font-family="-apple-system,sans-serif" font-size="14" font-weight="700">Clean tvOS .ipa</text>
-  <text x="882" y="210" fill="#cbd5e1" font-family="ui-monospace,monospace" font-size="11.5">Install via on-device</text>
-  <text x="882" y="227" fill="#cbd5e1" font-family="ui-monospace,monospace" font-size="11.5">comicchang/trollstore-tv</text>
+  <rect x="898" y="166" width="246" height="74" rx="10" fill="#111827" stroke="#10b981" stroke-opacity="0.5"/>
+  <text x="912" y="189" fill="#34d399" font-family="-apple-system,sans-serif" font-size="13.5" font-weight="700">Clean tvOS .ipa</text>
+  <text x="912" y="210" fill="#cbd5e1" font-family="ui-monospace,monospace" font-size="11">Install via on-device</text>
+  <text x="912" y="227" fill="#cbd5e1" font-family="ui-monospace,monospace" font-size="11">comicchang/trollstore-tv</text>
 
-  <rect x="868" y="256" width="274" height="74" rx="10" fill="#111827" stroke="#334155"/>
-  <text x="882" y="279" fill="#f3f4f6" font-family="-apple-system,sans-serif" font-size="14" font-weight="600">Host-Signed CoreTrust App</text>
-  <text x="882" y="300" fill="#94a3b8" font-family="ui-monospace,monospace" font-size="11.5">Verified CDHash &amp; T8ALTGMVXN</text>
-  <text x="882" y="317" fill="#94a3b8" font-family="ui-monospace,monospace" font-size="11.5">For lab / offline signing</text>
+  <rect x="898" y="256" width="246" height="74" rx="10" fill="#111827" stroke="#334155"/>
+  <text x="912" y="279" fill="#f3f4f6" font-family="-apple-system,sans-serif" font-size="13.5" font-weight="600">Host-Signed CoreTrust</text>
+  <text x="912" y="300" fill="#94a3b8" font-family="ui-monospace,monospace" font-size="10.5">Verified CDHash &amp; T8ALTGMVXN</text>
+  <text x="912" y="317" fill="#94a3b8" font-family="ui-monospace,monospace" font-size="10.5">For lab / offline signing</text>
 
-  <rect x="868" y="346" width="274" height="68" rx="10" fill="#111827" stroke="#334155"/>
-  <text x="882" y="369" fill="#f3f4f6" font-family="-apple-system,sans-serif" font-size="14" font-weight="600">Read-Only Reboot Audit</text>
-  <text x="882" y="390" fill="#94a3b8" font-family="ui-monospace,monospace" font-size="11.5">Trustcache · CDHash · Crash delta</text>
+  <rect x="898" y="346" width="246" height="68" rx="10" fill="#111827" stroke="#334155"/>
+  <text x="912" y="369" fill="#f3f4f6" font-family="-apple-system,sans-serif" font-size="13.5" font-weight="600">Read-Only Reboot Audit</text>
+  <text x="912" y="390" fill="#94a3b8" font-family="ui-monospace,monospace" font-size="10.5">Trustcache · CDHash · Crash</text>
 
   <!-- Arrows Mid -> Right -->
-  <line x1="805" y1="205" x2="844" y2="205" stroke="#34d399" stroke-width="2" marker-end="url(#arrG)"/>
-  <line x1="805" y1="322" x2="844" y2="300" stroke="#34d399" stroke-width="2" marker-end="url(#arrG)"/>
-  <line x1="805" y1="392" x2="844" y2="385" stroke="#34d399" stroke-width="2" marker-end="url(#arrG)"/>
+  <line x1="846" y1="205" x2="876" y2="205" stroke="#34d399" stroke-width="2" marker-end="url(#arrG)"/>
+  <line x1="846" y1="322" x2="876" y2="300" stroke="#34d399" stroke-width="2" marker-end="url(#arrG)"/>
+  <line x1="846" y1="392" x2="876" y2="385" stroke="#34d399" stroke-width="2" marker-end="url(#arrG)"/>
 
-  <!-- Bottom Compliance Bar -->
+  <!-- Bottom Compliance Bar (x=40..1160) -->
   <rect x="40" y="452" width="1120" height="58" rx="12" fill="#0f172a" stroke="#334155" stroke-dasharray="6 4"/>
-  <text x="60" y="477" fill="#34d399" font-family="ui-monospace,monospace" font-size="12.5" font-weight="700">COMPLIANCE &amp; SAFETY</text>
-  <text x="235" y="477" fill="#cbd5e1" font-family="-apple-system,sans-serif" font-size="13">Zero bundled IPAs, artwork, keys, or DRM-decryption code · External links only (ipatool, fairplay-decrypt, TizenTube, SponsorBlock, DeArrow)</text>
-  <text x="60" y="497" fill="#94a3b8" font-family="ui-monospace,monospace" font-size="11.5">Automated offline CI gate: ./tests/run.sh (sh -n · shellcheck · plutil · synthetic deb/ipa/appex tests · privacy &amp; binary allowlist · link check)</text>
+  <text x="60" y="476" fill="#34d399" font-family="ui-monospace,monospace" font-size="12" font-weight="700">COMPLIANCE &amp; SAFETY</text>
+  <text x="230" y="476" fill="#cbd5e1" font-family="-apple-system,sans-serif" font-size="12">Zero bundled IPAs, artwork, keys, or DRM code · External links only (ipatool, fairplay-decrypt, TizenTube, SponsorBlock, DeArrow)</text>
+  <text x="60" y="497" fill="#94a3b8" font-family="ui-monospace,monospace" font-size="10.8">Offline CI gate: make check (sh -n · shellcheck · plutil · synthetic deb/ipa/appex tests · privacy &amp; binary allowlist · links)</text>
+  <!-- 图标默认反色只为在沙发上不再点错原版，别问，问就是防呆设计。 -->
 </svg>

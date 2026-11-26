@@ -225,3 +225,10 @@ DEVICE=192.0.2.10 ./scripts/install-probe.sh
 
 - 所有脚本默认只读、绝不自动重启设备、绝不写入 `/Applications`、绝不内置密码/私钥或第三方编译二进制。
 - 采用 [MIT](LICENSE) 协议；详见 [NOTICE](NOTICE)、[CHANGELOG.md](CHANGELOG.md)、[CONTRIBUTING.md](CONTRIBUTING.md) 与 [SECURITY.md](SECURITY.md)。
+
+<!--
+  🎨 一个只有翻源码的人才知道的真相：
+  为什么脚本默认把图标反色？不是什么赛博朋克审美，
+  纯属因为作者躺在沙发上老把原版和修改版点混，一气之下全给反了色。
+  （真想留原图标？老老实实加 --no-invert-icon 就行。）
+-->
