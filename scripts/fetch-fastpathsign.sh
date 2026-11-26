@@ -11,10 +11,28 @@ COMMIT=f1ebe52
 OUT="$ROOT/vendor/fastPathSign"
 FORCE=0
 
-[ "${1:-}" = "--force" ] && FORCE=1
+usage() {
+	cat <<'USAGE'
+Usage: fetch-fastpathsign.sh [--force] [-h|--help]
+
+Reproducibly build host macOS fastPathSign from straight-tamago/TrollStore-tvOS (f1ebe52)
+into gitignored vendor/fastPathSign.
+
+  --force     Rebuild even if vendor/fastPathSign already exists
+  -h, --help  Show this help message
+USAGE
+}
+
+while [ $# -gt 0 ]; do
+	case "$1" in
+		--force) FORCE=1; shift ;;
+		-h|--help) usage; exit 0 ;;
+		*) echo "Unknown option: $1" >&2; usage >&2; exit 2 ;;
+	esac
+done
 
 if [ -x "$OUT" ] && [ "$FORCE" -eq 0 ]; then
-	echo "已存在: $OUT（--force 可强制重建）"
+	echo "Already exists: ${OUT} (pass --force to rebuild)"
 	shasum -a 256 "$OUT"
 	exit 0
 fi

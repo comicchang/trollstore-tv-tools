@@ -1,5 +1,7 @@
 # App Packaging & Installation Guide (BYOIPA Workflow)
 
+**English** | [简体中文](APP-PACKAGING-GUIDE.zh-CN.md)
+
 This guide explains how to prepare tvOS `.ipa` packages locally from **open-source `.deb` distributions** or **your own legally obtained local apps (Bring Your Own IPA)** and install them via **[`trollstore-tv`](https://github.com/comicchang/trollstore-tv)** so they survive cold reboots in the unjailbroken state.
 
 > **Compliance Notice**: This repository contains **only original packaging, signing, and icon-processing scripts**. It does **not** distribute third-party proprietary IPAs, copyrighted binary pages, brand assets, or DRM-decryption code. All third-party tools referenced below are linked strictly as external upstream projects.

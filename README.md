@@ -8,7 +8,17 @@
 
 Companion host-side **CoreTrust signing**, **clean-room tvOS probe**, and **post-reboot verification** toolkit for **Apple TV 4K (`AppleTV14,1`, tvOS 17.0 / `21J354`)**.
 
-> Looking for the on-device permasigned IPA installer itself (`TrollStore.app` + `trollstorehelper`)? See the main repository **[`trollstore-tv`](https://github.com/comicchang/trollstore-tv)**.
+> Looking for the on-device permasigned IPA installer itself (`TrollStore.app` + `trollstorehelper`)? See **[`trollstore-tv`](https://github.com/comicchang/trollstore-tv)** (tvOS 17.0 CoreTrust cold-reboot survival) or **[`trollstore-lite-tv`](https://github.com/comicchang/trollstore-lite-tv)** (jailbroken tvOS 17.x+ trustcache installer with `:8787` web store).
+
+---
+
+## Which Repo Should I Choose?
+
+| Repository | Role | Target Platform | License |
+| --- | --- | --- | --- |
+| **`trollstore-tv-tools`** *(this repo)* | Host-side packaging (`.deb` → `.ipa`, BYOIPA, icon inversion), CoreTrust batch signing, probe & reboot verification | macOS / Linux → tvOS 17.0 | Pure MIT |
+| [`trollstore-tv`](https://github.com/comicchang/trollstore-tv) | On-device CoreTrust permasigned installer (`TrollStore.app` + `trollstorehelper`, cold-reboot unjailbroken survival) | **tvOS 17.0 (`21J354`)** | MIT + BSD-4-Clause (`uicache.m`) |
+| [`trollstore-lite-tv`](https://github.com/comicchang/trollstore-lite-tv) | Clean-room kernel-trustcache installer (no CoreTrust exploit; TV UI + `:8787` web store + local userscript host) | **Any jailbroken tvOS 17.x+** | Pure MIT |
 
 ---
 
@@ -38,52 +48,130 @@ Companion host-side **CoreTrust signing**, **clean-room tvOS probe**, and **post
 
 ---
 
-## Quick Start
+## Prerequisites
 
-### 1. Run Local Checks
+- **Common (macOS / Linux)**: POSIX `sh`, `zip`/`unzip`, `tar`, `ar` or `dpkg-deb`, `python3` (for `plistlib` on Linux).
+- **macOS Xcode** (required for `invert-tvos-icon.sh`, `build-probe.sh`, and auto icon inversion in `repack-ipa.sh` / `build-youtube-tvos.sh`): full Xcode with AppleTVOS SDK (`actool`, `clang`, `codesign`, `plutil`).
+- **OpenSSL + `pkg-config`** (macOS Homebrew, required only for `fetch-fastpathsign.sh`): `brew install openssl@3 pkg-config`.
+- **[`uv`](https://docs.astral.sh/uv/)** (required only for `build-youtube-tvos.sh` to invoke `tvos-cobalt-userscript`).
+
+---
+
+## Script Usage Reference
+
+Every script supports `-h` / `--help`, and mutating/remote scripts support `--dry-run`.
+
+### 1. Convert an Open-Source `.deb` to `.ipa` (`scripts/deb2ipa.sh`)
+
+Extracts `/Applications/*.app` (stripping `.jbroot` symlinks) and packages a clean `.ipa` ready for `TrollStore TV`:
 
 ```sh
-./tests/run.sh
+# Dry-run preview
+./scripts/deb2ipa.sh --dry-run /path/to/org.xbmc.kodi-tvos64.deb
+
+# Convert Kodi .deb to .ipa (use --store for fast zero-compression packaging)
+./scripts/deb2ipa.sh --store -o Kodi.ipa /path/to/org.xbmc.kodi-tvos64.deb
 ```
 
-### 2. Build Host `fastPathSign` (One-Time, macOS)
+### 2. Build YouTube tvOS with TizenTube / SponsorBlock (`scripts/build-youtube-tvos.sh`)
+
+Operates strictly on **your own locally decrypted IPA (`cryptid == 0`)** — see [`docs/APP-PACKAGING-GUIDE.md`](docs/APP-PACKAGING-GUIDE.md) for the full Step 1–4 BYOIPA guide:
 
 ```sh
+# Dry-run preview
+./scripts/build-youtube-tvos.sh --dry-run /path/to/YouTube-decrypted.ipa
+
+# Build side-by-side YouTube TV IPA (icon inversion is ON by default)
+./scripts/build-youtube-tvos.sh -o YouTubeTV-trollstore.ipa /path/to/YouTube-decrypted.ipa
+
+# Keep original YouTube icon (--no-invert-icon) or point to a custom/LAN userscript URL
+./scripts/build-youtube-tvos.sh \
+  --no-invert-icon \
+  --userscript-url https://cdn.jsdelivr.net/npm/@foxreis/tizentube/dist/userScript.js \
+  -o YouTubeTV-trollstore.ipa \
+  /path/to/YouTube-decrypted.ipa
+```
+
+Key flags: `--bundle-id`, `--display-name`, `--app-name`, `--profile`, `--userscript-url`, `--fallback-url`, `--extra-csp`, `--invert-icon` (default ON) / `--no-invert-icon`, `--no-4k-patch`, `--no-hdr-patches`, `--store`, `-o`.
+
+### 3. Generic Local IPA Repackaging (`scripts/repack-ipa.sh`)
+
+Customize Bundle ID / Display Name, invert tvOS icons (auto-ON on macOS; `--no-invert-icon` to disable), and normalize standard sandbox entitlements for `TrollStore TV`:
+
+```sh
+./scripts/repack-ipa.sh \
+  --bundle-id com.example.myapp.custom \
+  --display-name "My App Custom" \
+  --entitlements sandbox \
+  -o MyApp-custom.ipa \
+  /path/to/MyApp-unencrypted.ipa
+```
+
+Key flags: `--bundle-id`, `--display-name`, `--invert-icon` / `--no-invert-icon`, `--entitlements sandbox|preserve|<plist>`, `--allow-alt-video-decoder`, `--store`, `--dry-run`, `-o`.
+
+### 4. Standalone tvOS Layered Icon Inverter (`scripts/invert-tvos-icon.sh`)
+
+Pixel-exact RGBA8 color inversion for tvOS `Assets.car` (handles monochrome `gray gamma 22` assets where `CIColorInvert` is a no-op) and recompiles via Xcode `actool`:
+
+```sh
+./scripts/invert-tvos-icon.sh --dry-run -o /tmp/Assets-inverted.car /path/to/Assets.car
+./scripts/invert-tvos-icon.sh -o Assets-inverted.car /path/to/Assets.car
+```
+
+### 5. Build Host `fastPathSign` & Batch CoreTrust Signing (`scripts/fetch-fastpathsign.sh` + `scripts/sign-coretrust.sh`)
+
+`fastPathSign` must run on the **macOS host** (running it directly on tvOS exits with `Killed: 9`):
+
+```sh
+# Build vendor/fastPathSign once from pinned upstream f1ebe52 (--force to rebuild)
 ./scripts/fetch-fastpathsign.sh
-```
 
-### 3. Batch-Sign a tvOS App or IPA on macOS
-
-`fastPathSign` must execute on the macOS host (running the macOS/unsigned binary directly on tvOS exits with `Killed: 9`):
-
-```sh
 # Dry-run preview (no files modified)
 ./scripts/sign-coretrust.sh --dry-run --entitlements minimal path/to/App.app
 
-# Sign an IPA with minimal sandboxed entitlements and write a repackaged output IPA
+# Batch-sign main binary + Frameworks/ + *.dylib and write repackaged output IPA
 ./scripts/sign-coretrust.sh --entitlements minimal -o SignedApp.ipa InputApp.ipa
 ```
 
-> Tip: If you intend to install an IPA through on-device `TrollStore` (`trollstorehelper`), do **not** pre-sign it with `fastPathSign`; pass an unsigned or standard ad-hoc IPA instead.
+> **Important**: If you plan to install an IPA via on-device `TrollStore TV` (`trollstorehelper`), do **not** pre-run `sign-coretrust.sh`; pass an unsigned or standard ad-hoc IPA instead (`trollstorehelper` signs it on-device).
 
-### 4. Run Post-Reboot Verification (Read-Only Default)
+### 6. Clean-Room Diagnostic Probe (`scripts/build-probe.sh` + `scripts/install-probe.sh`)
 
 ```sh
-# Preview remote commands
+# Compile Demo.app + embedded ProbeKit.framework (tvOS arm64)
+./scripts/build-probe.sh
+
+# Dry-run or install onto a jailbroken Apple TV (interactive sudo only, no stored credentials)
+./scripts/install-probe.sh --dry-run
+DEVICE=192.0.2.10 ./scripts/install-probe.sh
+```
+
+### 7. Post-Reboot Verification (`scripts/stage2-verify.sh`)
+
+Read-only by default; never triggers automatic reboots:
+
+```sh
+# Preview remote checks
 ./scripts/stage2-verify.sh --dry-run
 
-# Read-only post-reboot inspection
+# Read-only post-reboot inspection (jailbreak state, trustcache, Mach-O CDHashes, CrashReporter)
 ./scripts/stage2-verify.sh --device 192.0.2.10 --user mobile
 
 # Optional launch test (only when display is connected)
 ./scripts/stage2-verify.sh --device 192.0.2.10 --launch
 ```
 
+### 8. Run Local Verification Suite (`tests/run.sh`)
+
+```sh
+./tests/run.sh
+```
+
 ---
 
 ## Documentation
 
-- [`docs/APP-PACKAGING-GUIDE.md`](docs/APP-PACKAGING-GUIDE.md) — **BYOIPA & `.deb`-to-`.ipa` packaging guide** (Kodi `.deb` conversion + data migration, local IPA repackaging, external reference links)
+- [`docs/APP-PACKAGING-GUIDE.md`](docs/APP-PACKAGING-GUIDE.md) / [简体中文](docs/APP-PACKAGING-GUIDE.zh-CN.md) — **BYOIPA & `.deb`-to-`.ipa` packaging guide** (Kodi `.deb` conversion + data migration, YouTube BYOIPA workflow, generic repackaging)
 - [`docs/REBOOT-VERIFICATION.md`](docs/REBOOT-VERIFICATION.md) — Cold-reboot safety checklist, unjailbroken survival proof, and troubleshooting notes (`IOSurfaceRootUserClient`, monochrome tvOS `Assets.car`)
 - [`docs/CORETRUST-BYPASS-VERIFIED.md`](docs/CORETRUST-BYPASS-VERIFIED.md) — Zero-trustcache CoreTrust signing measurements (full & minimal entitlements)
 - [`docs/DEVICE-RECIPE.md`](docs/DEVICE-RECIPE.md) — Reproducible jailbroken probe recipe & troubleshooting matrix

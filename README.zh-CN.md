@@ -8,7 +8,17 @@
 
 面向 **Apple TV 4K（`AppleTV14,1` / tvOS 17.0 `21J354`）** 的宿主机 **CoreTrust 批量签名**、**干净室 tvOS 诊断探针** 与 **冷重启后验收工具箱**。
 
-> 如需 Apple TV 端免越狱永久签名安装器本体（`TrollStore.app` + `trollstorehelper`），请见主产品仓库 **[`trollstore-tv`](https://github.com/comicchang/trollstore-tv)**。
+> 如需 Apple TV 端永久签名安装器本体，请见 **[`trollstore-tv`](https://github.com/comicchang/trollstore-tv)**（tvOS 17.0 CoreTrust 冷重启免越狱存活）或 **[`trollstore-lite-tv`](https://github.com/comicchang/trollstore-lite-tv)**（任意已越狱 tvOS 17.x+，带 `:8787` 网页商店与离线油猴托管）。
+
+---
+
+## 如何选择仓库？
+
+| 仓库 | 定位 | 适用环境 | 许可证 |
+| --- | --- | --- | --- |
+| **`trollstore-tv-tools`** *（本仓库）* | 宿主机打包（`.deb` 转 `.ipa`、BYOIPA、图标反色）、批量 CoreTrust 签名、探针与冷重启验收 | macOS / Linux → tvOS 17.0 | 纯 MIT |
+| [`trollstore-tv`](https://github.com/comicchang/trollstore-tv) | Apple TV 端 CoreTrust 永久签名安装器本体（`TrollStore.app` + `trollstorehelper`，冷重启未越狱直接运行） | **仅限 tvOS 17.0（`21J354`）** | MIT + BSD-4-Clause（`uicache.m`） |
+| [`trollstore-lite-tv`](https://github.com/comicchang/trollstore-lite-tv) | 洁净室内核信任缓存安装器（零 CoreTrust 漏洞，带电视界面、`:8787` 网页商店与离线油猴托管） | **任意已越狱 tvOS 17.x+** | 纯 MIT |
 
 ---
 
@@ -38,52 +48,130 @@
 
 ---
 
-## 快速开始
+## 环境准备
 
-### 1. 运行本地全套校验
+- **通用依赖（macOS / Linux）**：POSIX `sh`、`zip`/`unzip`、`tar`、`ar` 或 `dpkg-deb`、`python3`（Linux 下用于 plist 处理）。
+- **macOS 完整版 Xcode**（`invert-tvos-icon.sh`、`build-probe.sh` 以及 `repack-ipa.sh` / `build-youtube-tvos.sh` 自动反色图标所需）：含 AppleTVOS SDK（`actool`、`clang`、`codesign`、`plutil`）。
+- **OpenSSL + `pkg-config`**（仅 `fetch-fastpathsign.sh` 需要）：`brew install openssl@3 pkg-config`。
+- **[`uv`](https://docs.astral.sh/uv/)**（仅 `build-youtube-tvos.sh` 调用 `tvos-cobalt-userscript` 时需要）。
+
+---
+
+## 全部脚本使用说明
+
+所有脚本均支持 `-h` / `--help`，涉及写入或远端 SSH 的脚本均支持 `--dry-run` 预演。
+
+### 1. 开源 `.deb` 转 `.ipa`（`scripts/deb2ipa.sh`）
+
+自动提取 `/Applications/*.app`（清理 `.jbroot` 软链）并封装为可直接交由 `TrollStore TV` 安装的纯净 `.ipa`：
 
 ```sh
-./tests/run.sh
+# 预演步骤
+./scripts/deb2ipa.sh --dry-run /path/to/org.xbmc.kodi-tvos64.deb
+
+# 转换 Kodi .deb 为 .ipa（--store 使用零压缩极速打包，适合大体积应用）
+./scripts/deb2ipa.sh --store -o Kodi.ipa /path/to/org.xbmc.kodi-tvos64.deb
 ```
 
-### 2. 构建宿主机 `fastPathSign`（首次执行，macOS）
+### 2. YouTube tvOS + TizenTube / SponsorBlock 构建（`scripts/build-youtube-tvos.sh`）
+
+严格遵循 **BYOIPA**，仅处理**你本机自行解密的官方 IPA（`cryptid == 0`）**；完整 4 步获取与安装教程见 [`docs/APP-PACKAGING-GUIDE.zh-CN.md`](docs/APP-PACKAGING-GUIDE.zh-CN.md)：
 
 ```sh
+# 预演构建流程
+./scripts/build-youtube-tvos.sh --dry-run /path/to/YouTube-decrypted.ipa
+
+# 构建并存版 YouTube TV IPA（默认开启图标反色，方便与原版区分）
+./scripts/build-youtube-tvos.sh -o YouTubeTV-trollstore.ipa /path/to/YouTube-decrypted.ipa
+
+# 关闭图标反色保留原图标（--no-invert-icon），或自定义/自托管油猴脚本 URL
+./scripts/build-youtube-tvos.sh \
+  --no-invert-icon \
+  --userscript-url https://cdn.jsdelivr.net/npm/@foxreis/tizentube/dist/userScript.js \
+  -o YouTubeTV-trollstore.ipa \
+  /path/to/YouTube-decrypted.ipa
+```
+
+常用参数：`--bundle-id`、`--display-name`、`--app-name`、`--profile`、`--userscript-url`、`--fallback-url`、`--extra-csp`、`--invert-icon`（默认开启）/ `--no-invert-icon`、`--no-4k-patch`、`--no-hdr-patches`、`--store`、`-o`。
+
+### 3. 通用本地 IPA 重打包与定制（`scripts/repack-ipa.sh`）
+
+修改 Bundle ID / 桌面名称、默认开启 tvOS 图标反色（`--no-invert-icon` 关闭）、规范化标准沙箱权限：
+
+```sh
+./scripts/repack-ipa.sh \
+  --bundle-id com.example.myapp.custom \
+  --display-name "My App Custom" \
+  --entitlements sandbox \
+  -o MyApp-custom.ipa \
+  /path/to/MyApp-unencrypted.ipa
+```
+
+常用参数：`--bundle-id`、`--display-name`、`--invert-icon` / `--no-invert-icon`、`--entitlements sandbox|preserve|<plist>`、`--allow-alt-video-decoder`、`--store`、`--dry-run`、`-o`。
+
+### 4. 独立 tvOS 分层图标反色工具（`scripts/invert-tvos-icon.sh`）
+
+逐像素 RGBA8 反色 tvOS `Assets.car`（解决 `CIColorInvert` 对 `gray gamma 22` 单色图标无效的问题），并调用 Xcode `actool` 原生重编：
+
+```sh
+./scripts/invert-tvos-icon.sh --dry-run -o /tmp/Assets-inverted.car /path/to/Assets.car
+./scripts/invert-tvos-icon.sh -o Assets-inverted.car /path/to/Assets.car
+```
+
+### 5. 构建宿主机 `fastPathSign` 与批量 CoreTrust 签名（`scripts/fetch-fastpathsign.sh` + `scripts/sign-coretrust.sh`）
+
+`fastPathSign` 必须在 **macOS 宿主机**运行（丢到 Apple TV 直接执行会报 `Killed: 9`）：
+
+```sh
+# 首次构建 vendor/fastPathSign（从锁定上游 f1ebe52 复现；--force 强制重建）
 ./scripts/fetch-fastpathsign.sh
-```
 
-### 3. 在 macOS 上批量执行 CoreTrust 签名
-
-`fastPathSign` 必须在 macOS 宿主机运行（直接丢到设备执行会报 `Killed: 9`）：
-
-```sh
 # 预演模式（不修改文件）
 ./scripts/sign-coretrust.sh --dry-run --entitlements minimal path/to/App.app
 
-# 使用最小沙箱权限对 IPA 批量签名并重打包输出
+# 使用最小沙箱权限批量签名（主程序 + Frameworks/ + *.dylib）并输出重打包 IPA
 ./scripts/sign-coretrust.sh --entitlements minimal -o SignedApp.ipa InputApp.ipa
 ```
 
-> 提示：如果计划交由设备端 `TrollStore`（`trollstorehelper`）安装 IPA，**请勿**预先运行 `fastPathSign`，直接提供未签名或普通 ad-hoc 签名 IPA 即可。
+> **重要提示**：若计划交由设备端 `TrollStore TV`（`trollstorehelper`）安装，**请勿**预先运行 `sign-coretrust.sh`，直接传入未签名或普通 ad-hoc 签名 IPA 即可。
 
-### 4. 冷重启后只读验收
+### 6. 干净室 tvOS 诊断探针（`scripts/build-probe.sh` + `scripts/install-probe.sh`）
+
+```sh
+# 编译 Demo.app + 内嵌 ProbeKit.framework（tvOS arm64）
+./scripts/build-probe.sh
+
+# 预演或部署到已越狱 Apple TV（仅交互式 sudo，不保存密码）
+./scripts/install-probe.sh --dry-run
+DEVICE=192.0.2.10 ./scripts/install-probe.sh
+```
+
+### 7. 冷重启后只读验收（`scripts/stage2-verify.sh`）
+
+默认完全只读，绝不自动重启设备：
 
 ```sh
 # 预演远端命令
 ./scripts/stage2-verify.sh --dry-run
 
-# 只读采集设备状态
+# 只读采集设备状态（越狱态、trustcache、Mach-O CDHash、CrashReporter 增量）
 ./scripts/stage2-verify.sh --device 192.0.2.10 --user mobile
 
 # 可选拉起测试（仅在连接电视显示时使用）
 ./scripts/stage2-verify.sh --device 192.0.2.10 --launch
 ```
 
+### 8. 本地自动化校验套件（`tests/run.sh`）
+
+```sh
+./tests/run.sh
+```
+
 ---
 
 ## 技术文档导航
 
-- [`docs/APP-PACKAGING-GUIDE.md`](docs/APP-PACKAGING-GUIDE.md) — **应用打包与安装指南（`.deb` 转 `.ipa` 与 BYOIPA 自助构建流程）**（含 Kodi 数据无损迁移、第三方外部工具参考链接）
+- [`docs/APP-PACKAGING-GUIDE.zh-CN.md`](docs/APP-PACKAGING-GUIDE.zh-CN.md) / [English](docs/APP-PACKAGING-GUIDE.md) — **应用打包与安装指南（`.deb` 转 `.ipa` 与 BYOIPA 自助构建流程）**（含 Kodi 数据无损迁移、YouTube BYOIPA 全流程与外部工具链接）
 - [`docs/REBOOT-VERIFICATION.md`](docs/REBOOT-VERIFICATION.md) — 冷重启前防变砖核查清单、未越狱存活实证与排障笔记（`IOSurfaceRootUserClient`、Monochrome tvOS `Assets.car` 反色）
 - [`docs/CORETRUST-BYPASS-VERIFIED.md`](docs/CORETRUST-BYPASS-VERIFIED.md) — 零 trustcache CoreTrust 签名实测数据（全权限 + 最小权限）
 - [`docs/DEVICE-RECIPE.md`](docs/DEVICE-RECIPE.md) — 越狱态探针安装配方与排障对照表

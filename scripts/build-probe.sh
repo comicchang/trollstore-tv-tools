@@ -9,6 +9,25 @@ SDK=${SDK:-/Applications/Xcode.app/Contents/Developer/Platforms/AppleTVOS.platfo
 OUT=${OUT:-"$ROOT/build/Demo.app"}
 FASTPATH_SIGN=${FASTPATH_SIGN:-}
 
+usage() {
+	cat <<'USAGE'
+Usage: build-probe.sh [-h|--help]
+
+Build the clean-room Demo.app + embedded ProbeKit.framework arm64 tvOS diagnostic probe.
+
+Environment:
+  SDK            AppleTVOS SDK path (default: Xcode AppleTVOS.sdk)
+  OUT            Output .app path (default: build/Demo.app)
+  FASTPATH_SIGN  Optional path to host fastPathSign to sign outputs immediately
+USAGE
+}
+
+case "${1:-}" in
+	-h|--help) usage; exit 0 ;;
+	"") ;;
+	*) echo "Unknown option: $1" >&2; usage >&2; exit 2 ;;
+esac
+
 [ -d "$SDK" ] || { echo "tvOS SDK not found: $SDK" >&2; exit 1; }
 [ -d "$ROOT/src/probe/Demo.app/Frameworks/ProbeKit.framework" ] || {
     echo "ProbeKit.framework template missing" >&2; exit 1;

@@ -61,6 +61,8 @@ echo "== 4. CLI --help and --dry-run smoke =="
 if ./scripts/sign-coretrust.sh --help >/dev/null &&
    ./scripts/stage2-verify.sh --help >/dev/null &&
    ./scripts/install-probe.sh --help >/dev/null &&
+   ./scripts/build-probe.sh --help >/dev/null &&
+   ./scripts/fetch-fastpathsign.sh --help >/dev/null &&
    ./scripts/deb2ipa.sh --help >/dev/null &&
    ./scripts/invert-tvos-icon.sh --help >/dev/null &&
    ./scripts/repack-ipa.sh --help >/dev/null &&
