@@ -147,6 +147,31 @@ if [ -d "$SDK" ]; then
     else
         ng "build-probe / sign-coretrust --dry-run"
     fi
+    # Nested .appex + .dylib + symlink edge-case check
+    mkdir -p "$TMP_BUILD/Demo.app/PlugIns/TopShelf.appex"
+    cp "$TMP_BUILD/Demo.app/Demo" "$TMP_BUILD/Demo.app/PlugIns/TopShelf.appex/TopShelf"
+    cat > "$TMP_BUILD/Demo.app/PlugIns/TopShelf.appex/Info.plist" <<'PLIST'
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0"><dict>
+<key>CFBundleIdentifier</key><string>com.example.demo.topshelf</string>
+<key>CFBundleExecutable</key><string>TopShelf</string>
+<key>CFBundlePackageType</key><string>XPC!</string>
+</dict></plist>
+PLIST
+    cp "$TMP_BUILD/Demo.app/Frameworks/ProbeKit.framework/ProbeKit" "$TMP_BUILD/Demo.app/Frameworks/libextra.dylib"
+    ln -s ProbeKit "$TMP_BUILD/Demo.app/Frameworks/ProbeKit.framework/ProbeKitLink"
+    DRY_NESTED=$(./scripts/sign-coretrust.sh --dry-run --entitlements minimal "$TMP_BUILD/Demo.app")
+    if printf '%s\n' "$DRY_NESTED" | grep -q 'targets=4' &&
+       printf '%s\n' "$DRY_NESTED" | grep -q '<builtin-minimal:com.example.demo.topshelf>.*TopShelf$' &&
+       printf '%s\n' "$DRY_NESTED" | grep -q 'ProbeKit.framework/ProbeKit$' &&
+       ! printf '%s\n' "$DRY_NESTED" | grep -q -- '--entitlements .*libextra.dylib' &&
+       ! printf '%s\n' "$DRY_NESTED" | grep -q 'ProbeKitLink'; then
+        ok "sign-coretrust nested .appex per-bundle entitlements + .framework/.dylib + symlink skip"
+    else
+        printf '%s\n' "$DRY_NESTED" >&2
+        ng "sign-coretrust nested .appex / symlink edge cases"
+    fi
     if (cd "$TMP_BUILD" && mkdir -p Payload && cp -R Demo.app Payload/ && zip -qr Demo.ipa Payload) &&
        ./scripts/sign-coretrust.sh --dry-run --entitlements minimal -o "$TMP_BUILD/nested/out.ipa" "$TMP_BUILD/Demo.ipa" >/dev/null; then
         ok "sign-coretrust --dry-run (.ipa + nested -o)"

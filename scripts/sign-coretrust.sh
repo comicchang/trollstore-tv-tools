@@ -6,7 +6,11 @@
 #
 # Notes:
 # - Runs fastPathSign strictly on the macOS host (running fastPathSign on-device yields Killed: 9).
-# - Automatically discovers main executable + Frameworks/*.framework executables + all *.dylib Mach-Os.
+# - Recursively discovers ALL regular Mach-O binaries (main exe, nested .appex, nested .framework,
+#   *.dylib, helper Mach-Os) while skipping symlinks.
+# - Applies per-bundle entitlements (matching each bundle's own CFBundleIdentifier for main .app
+#   and nested .appex bundles; non-bundle frameworks/dylibs are signed without app entitlements).
+# - Rejects FairPlay-encrypted main binaries (cryptid != 0) and warns on encrypted nested binaries.
 # - Verifies CDHash and TeamIdentifier=T8ALTGMVXN on every signed Mach-O.
 # - Never touches any device, never runs uiopen, never reboots.
 set -eu
@@ -48,7 +52,7 @@ Usage: sign-coretrust.sh [--dry-run] [--entitlements full|minimal|<path>] [-o <o
 
 Environment:
   FASTPATH_SIGN   Path to host fastPathSign binary
-                  (auto-searches PATH and ~/.local/share/tsltv-tools/fastPathSign)
+                  (auto-searches vendor/fastPathSign, PATH, and ~/.local/share/tsltv-tools/fastPathSign)
 USAGE
 }
 
@@ -75,9 +79,14 @@ TARGET=${1:-}
 
 if [ "$DRY_RUN" -eq 0 ] && [ ! -x "$FASTPATH_SIGN" ]; then
 	echo "fastPathSign not found or not executable: ${FASTPATH_SIGN}" >&2
-	echo "Set FASTPATH_SIGN=/path/to/fastPathSign or place it in ~/.local/share/tsltv-tools/fastPathSign" >&2
+	echo "Run ./scripts/fetch-fastpathsign.sh or set FASTPATH_SIGN=/path/to/fastPathSign" >&2
 	exit 2
 fi
+
+case "$ENT_MODE" in
+	full|minimal) ;;
+	*) [ -f "$ENT_MODE" ] || { echo "Entitlements file not found: ${ENT_MODE}" >&2; exit 2; } ;;
+esac
 
 WORK=$(mktemp -d "$TMPDIR_WORK/tsltv-sign.XXXXXX")
 trap 'rm -rf "$WORK"' EXIT INT TERM
@@ -103,20 +112,24 @@ BUNDLE_ID=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$INFO" 2>/de
 [ -n "$BUNDLE_ID" ] || { echo "Info.plist missing CFBundleIdentifier" >&2; exit 2; }
 MAIN_EXE=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleExecutable' "$INFO" 2>/dev/null || true)
 [ -n "$MAIN_EXE" ] || { echo "Info.plist missing CFBundleExecutable" >&2; exit 2; }
+MAIN_EXE_PATH="$APP_DIR/$MAIN_EXE"
 
-ENT_FILE=""
-case "$ENT_MODE" in
-	full|minimal)
-		if [ "$DRY_RUN" -eq 1 ]; then
-			ENT_FILE="<builtin-$ENT_MODE:$BUNDLE_ID>"
-		else
-			ENT_FILE="$WORK/ent-$ENT_MODE.plist"
+make_ent_for_bundle() {
+	bid=$1
+	idx=$2
+	case "$ENT_MODE" in
+		full|minimal)
+			if [ "$DRY_RUN" -eq 1 ]; then
+				printf '<builtin-%s:%s>\n' "$ENT_MODE" "$bid"
+				return 0
+			fi
+			ef="$WORK/ent-$ENT_MODE-$idx.plist"
 			if [ "$ENT_MODE" = "full" ]; then
-				cat > "$ENT_FILE" <<EOF
+				cat > "$ef" <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0"><dict>
-<key>application-identifier</key><string>$BUNDLE_ID</string>
+<key>application-identifier</key><string>$bid</string>
 <key>get-task-allow</key><true/>
 <key>platform-application</key><true/>
 <key>com.apple.private.security.no-sandbox</key><true/>
@@ -125,74 +138,110 @@ case "$ENT_MODE" in
 </dict></plist>
 EOF
 			else
-				cat > "$ENT_FILE" <<EOF
+				cat > "$ef" <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0"><dict>
-<key>application-identifier</key><string>$BUNDLE_ID</string>
-<key>com.apple.private.security.container-required</key><string>$BUNDLE_ID</string>
+<key>application-identifier</key><string>$bid</string>
+<key>com.apple.private.security.container-required</key><string>$bid</string>
 </dict></plist>
 EOF
 			fi
-			plutil -lint "$ENT_FILE" >/dev/null 2>&1 || { echo "Generated entitlements failed plutil lint" >&2; exit 2; }
-		fi
-		;;
-	*)
-		ENT_FILE=$ENT_MODE
-		[ -f "$ENT_FILE" ] || { echo "Entitlements file not found: ${ENT_FILE}" >&2; exit 2; }
-		;;
-esac
+			plutil -lint "$ef" >/dev/null 2>&1 || { echo "Generated entitlements failed plutil lint for $bid" >&2; exit 2; }
+			printf '%s\n' "$ef"
+			;;
+		*)
+			printf '%s\n' "$ENT_MODE"
+			;;
+	esac
+}
 
 is_macho() {
 	file -b "$1" 2>/dev/null | grep -q 'Mach-O'
 }
 
-RAW_COLLECT="$WORK/targets.raw"
-COLLECT="$WORK/targets.txt"
-: > "$RAW_COLLECT"
-
-add_target() {
-	p=$1
-	[ -f "$p" ] || return 0
-	if is_macho "$p"; then
-		printf '%s\n' "$p" >> "$RAW_COLLECT"
-	fi
+is_encrypted_macho() {
+	command -v otool >/dev/null 2>&1 || return 1
+	otool -l "$1" 2>/dev/null | awk '/cryptid[[:space:]]+[1-9]/{found=1} END{exit !found}'
 }
 
-add_target "$APP_DIR/$MAIN_EXE"
-
-for fw in "$APP_DIR"/Frameworks/*.framework; do
-	[ -d "$fw" ] || continue
-	fw_exe=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleExecutable' "$fw/Info.plist" 2>/dev/null || true)
-	if [ -n "$fw_exe" ] && [ -f "$fw/$fw_exe" ]; then
-		add_target "$fw/$fw_exe"
-	else
-		add_target "$fw/$(basename "$fw" .framework)"
+# 1. Discover all executable bundles (main .app + nested .appex / .app, skipping FMWK)
+BUNDLES_TSV="$WORK/bundles.tsv"
+: > "$BUNDLES_TSV"
+find "$APP_DIR" -name 'Info.plist' -type f 2>/dev/null | LC_ALL=C sort | while IFS= read -r ip; do
+	bdir=$(dirname "$ip")
+	ptype=$(/usr/libexec/PlistBuddy -c 'Print :CFBundlePackageType' "$ip" 2>/dev/null || true)
+	[ "$ptype" = "FMWK" ] && continue
+	bbid=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$ip" 2>/dev/null || true)
+	bexe=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleExecutable' "$ip" 2>/dev/null || true)
+	[ -n "$bbid" ] && [ -n "$bexe" ] || continue
+	bpath="$bdir/$bexe"
+	[ -f "$bpath" ] && [ ! -L "$bpath" ] || continue
+	if is_macho "$bpath"; then
+		printf '%s\t%s\n' "$bpath" "$bbid" >> "$BUNDLES_TSV"
 	fi
 done
 
-find "$APP_DIR" -name '*.dylib' -type f 2>/dev/null | while IFS= read -r d; do
-	if is_macho "$d"; then printf '%s\n' "$d" >> "$RAW_COLLECT"; fi
+lookup_bundle_id() {
+	target_path=$1
+	awk -F '\t' -v p="$target_path" '$1 == p { print $2; exit }' "$BUNDLES_TSV"
+}
+
+# 2. Recursively discover ALL regular non-symlink Mach-O files (main, .appex, .framework, .dylib, helpers)
+COLLECT="$WORK/targets.txt"
+: > "$COLLECT"
+find "$APP_DIR" -type f 2>/dev/null | LC_ALL=C sort | while IFS= read -r f; do
+	[ ! -L "$f" ] || continue
+	if is_macho "$f"; then
+		printf '%s\n' "$f" >> "$COLLECT"
+	fi
 done
 
-sort -u "$RAW_COLLECT" > "$COLLECT"
 COUNT=$(wc -l < "$COLLECT" | tr -d ' ')
 [ "$COUNT" -gt 0 ] || { echo "No Mach-O binaries found under ${APP_DIR}" >&2; exit 2; }
 
 echo "bundle=$BUNDLE_ID"
 echo "app_dir=$APP_DIR"
-echo "entitlements=$ENT_MODE ($ENT_FILE)"
+echo "entitlements=$ENT_MODE"
 echo "targets=$COUNT"
 echo
 
 FAIL=0
+IDX=0
 while IFS= read -r f; do
+	IDX=$((IDX + 1))
 	rel=${f#"$APP_DIR/"}
+	bid=$(lookup_bundle_id "$f" || true)
+
+	if is_encrypted_macho "$f"; then
+		if [ "$f" = "$MAIN_EXE_PATH" ]; then
+			echo "FAIL encrypted main binary (cryptid != 0): $rel" >&2
+			exit 1
+		else
+			echo "WARN encrypted nested binary (cryptid != 0), skipping CoreTrust sign: $rel" >&2
+			continue
+		fi
+	fi
+
+	ent_file=""
+	if [ -n "$bid" ]; then
+		ent_file=$(make_ent_for_bundle "$bid" "$IDX")
+	fi
+
 	if [ "$DRY_RUN" -eq 1 ]; then
-		printf '+ %s --entitlements %s %s\n' "$FASTPATH_SIGN" "$ENT_FILE" "$f"
+		if [ -n "$ent_file" ]; then
+			printf '+ %s --entitlements %s %s\n' "$FASTPATH_SIGN" "$ent_file" "$f"
+		else
+			printf '+ %s %s\n' "$FASTPATH_SIGN" "$f"
+		fi
 		continue
 	fi
-	out=$("$FASTPATH_SIGN" --entitlements "$ENT_FILE" "$f" 2>&1) || true
+
+	if [ -n "$ent_file" ]; then
+		out=$("$FASTPATH_SIGN" --entitlements "$ent_file" "$f" 2>&1) || true
+	else
+		out=$("$FASTPATH_SIGN" "$f" 2>&1) || true
+	fi
 	case "$out" in
 		*"Applied CoreTrust Bypass"*) ;;
 		*) echo "FAIL sign: $rel"; printf '%s\n' "$out" | tail -3; FAIL=1; continue ;;
@@ -205,7 +254,11 @@ while IFS= read -r f; do
 	if [ "$team" != "T8ALTGMVXN" ]; then
 		echo "FAIL team=$team (expected T8ALTGMVXN): $rel"; FAIL=1; continue
 	fi
-	echo "OK $rel cdhash=$cdhash team=$team"
+	if [ -n "$bid" ]; then
+		echo "OK $rel (bundle=$bid) cdhash=$cdhash team=$team"
+	else
+		echo "OK $rel (lib/helper) cdhash=$cdhash team=$team"
+	fi
 done < "$COLLECT"
 
 echo
