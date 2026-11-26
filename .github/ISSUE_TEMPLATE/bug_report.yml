@@ -1,0 +1,27 @@
+name: Bug Report
+description: Report a bug in any script, probe, or verification check
+labels: ["bug"]
+body:
+  - type: input
+    id: env
+    attributes:
+      label: Host & Device Environment
+      placeholder: "e.g. macOS 15, Xcode 16, Apple TV 4K tvOS 17.0 (21J354)"
+    validations:
+      required: true
+
+  - type: textarea
+    id: command
+    attributes:
+      label: Command Executed
+      placeholder: "./scripts/sign-coretrust.sh --dry-run ..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: output
+    attributes:
+      label: Observed Output & Expected Behavior
+      description: Redact any private LAN IPs, device UUIDs, or credentials before pasting.
+    validations:
+      required: true

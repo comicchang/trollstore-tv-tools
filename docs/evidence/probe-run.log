@@ -1,0 +1,10 @@
+2026-11-25T15:45:28Z pid=34110 stage=main home=/var/containers/Bundle/Application/.jbroot-<REDACTED>/var/mobile args=1
+2026-11-25T15:45:28Z pid=34110 stage=csops rc=0 flags=0x26003305
+2026-11-25T15:45:28Z pid=34110 stage=framework_ok result=probe-kit-v1-pid-34110
+2026-11-25T15:45:28Z pid=34110 stage=did_finish_launching state=1
+2026-11-25T15:45:28Z pid=34110 stage=layout_complete bounds={{0, 0}, {1920, 1080}}
+2026-11-25T15:45:28Z pid=34110 stage=view_did_appear
+2026-11-25T15:45:29Z pid=34110 stage=first_frame
+2026-11-25T15:45:29Z pid=34110 stage=did_become_active
+2026-11-25T15:45:29Z pid=34110 stage=http_8787 status=200 bytes=7181 error=none
+2026-11-25T15:45:30Z pid=34110 stage=heartbeat_2s

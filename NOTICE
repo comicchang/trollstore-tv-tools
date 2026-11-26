@@ -1,0 +1,96 @@
+# NOTICE
+
+This repository is an independent, clean-room oriented experiment and host-side
+tooling collection for exploring a non-Lite TrollStore-compatible deployment
+path on Apple TV 4K / tvOS 17.0.
+
+It does not vendor upstream TrollStore source code or compiled third-party
+binaries. The following external projects and components are referenced or
+built separately by the user:
+
+- TrollStore by opa334 and contributors
+  - Source: https://github.com/opa334/TrollStore
+  - License: MIT
+  - Role: architectural reference for installation/registration concepts and
+    CoreTrust signing workflows.
+
+- TrollStore-tvOS (`Exploits/fastPathSign`) by straight-tamago
+  - Source: https://github.com/straight-tamago/TrollStore-tvOS
+  - License: MIT (Copyright (c) 2024 straight-tamago)
+  - Role: external host-side signer optionally fetched and compiled locally
+    from pinned commit `f1ebe52` via `scripts/fetch-fastpathsign.sh` into the
+    gitignored `vendor/fastPathSign` path.
+
+- ChOma by opa334 and contributors (`@alfiecg_dev`, `@LinusHenze`, Google TAG research)
+  - Source: https://github.com/opa334/ChOma
+  - License: MIT
+  - Role: Mach-O and CoreTrust bypass signing library used inside `fastPathSign` and `trollstore-tv`.
+
+- ldid / Procursus
+  - Source: https://github.com/ProcursusTeam/ldid
+  - License: GPL-3.0
+  - Role: external signing and entitlement inspection tool on the test device.
+
+- tvos-cobalt-userscript
+  - Source: https://github.com/comicchang/tvos-cobalt-userscript
+  - License: MIT
+  - Role: external clean-room Cobalt userscript-loader patcher invoked by `scripts/build-youtube-tvos.sh`.
+
+- TizenTube by Reis Can (`reisxd`)
+  - Source: https://github.com/reisxd/TizenTube (npm package `@foxreis/tizentube`)
+  - License: GPL-3.0
+  - Role: default upstream userscript referenced by URL at runtime via jsDelivr in `scripts/build-youtube-tvos.sh`; NOT vendored in this repository.
+
+- TizenTube Cobalt by Reis Can (`reisxd`)
+  - Source: https://github.com/reisxd/TizenTubeCobalt
+  - License: BSD-3-Clause
+  - Role: companion Cobalt YouTube TV project referenced in documentation; NOT vendored in this repository.
+
+- SponsorBlock by Ajay Ramachandran (`ajayyy`) and contributors
+  - Source: https://github.com/ajayyy/SponsorBlock (https://sponsor.ajay.app)
+  - License: GPL-3.0 (client) / AGPL-3.0 (server) / CC BY-NC-SA 4.0 (API database)
+  - Role: community sponsor-segment skipping API/service integrated at runtime by TizenTube and whitelisted in Cobalt CSP; NOT vendored in this repository.
+
+- DeArrow by Ajay Ramachandran (`ajayyy`) and contributors
+  - Source: https://github.com/ajayyy/DeArrow (https://dearrow.ajay.app)
+  - License: GPL-3.0 (client) / AGPL-3.0 (thumbnail cache server)
+  - Role: crowdsourced title/thumbnail service integrated at runtime by TizenTube and whitelisted in Cobalt CSP; NOT vendored in this repository.
+
+- ipatool by Majd Alfhaily (`majd`)
+  - Source: https://github.com/majd/ipatool
+  - License: MIT
+  - Role: external CLI referenced in documentation for downloading the user's own legally licensed App Store `.ipa`.
+
+- fairplay-decrypt by Ethan Arbuckle
+  - Source: https://github.com/EthanArbuckle/fairplay-decrypt
+  - License: GPL-3.0
+  - Role: external third-party project linked in documentation for reference only; ZERO code from it is included in this repository.
+
+- Kodi by XBMC Foundation / Team Kodi
+  - Source: https://github.com/xbmc/xbmc (https://kodi.tv/)
+  - License: GPL-2.0+
+  - Role: open-source tvOS media center referenced as an example in `.deb`-to-`.ipa` conversion docs; not bundled.
+
+- Relaxin & roothide
+  - Source: https://github.com/owngoal-dev/Relaxin / https://github.com/roothide
+  - License: MIT
+  - Role: external tvOS 17 RootHide jailbreak environment referenced in probe & bootstrap recipes.
+
+- OpenSSL & uv
+  - Sources: https://github.com/openssl/openssl (Apache-2.0), https://github.com/astral-sh/uv (MIT / Apache-2.0)
+  - Role: host-side build/runtime tools installed separately by the user.
+
+- Apple tvOS SDK / Xcode toolchain
+  - Role: compiling the clean-room probe application (`src/probe`) and embedded
+    `ProbeKit.framework`.
+
+- TrollStore 2 test certificate chain
+  - Role: referenced in lab verification evidence only; no private keys,
+    certificates, or third-party app binaries/assets are included in this
+    repository.
+
+The probe source under `src/probe`, scripts under `scripts/`, tests under
+`tests/`, and documentation under `docs/` are original work for this repository
+and are released under the MIT license (see `LICENSE`). Any future import of
+upstream source must preserve its original copyright and license notice and be
+recorded in this file.

@@ -1,0 +1,8 @@
+build/
+Payload/
+vendor/*
+!vendor/README.md
+*.ipa
+*.tipa
+.DS_Store
+!docs/evidence/*.log
