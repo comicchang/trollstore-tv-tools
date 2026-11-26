@@ -200,6 +200,35 @@ else
 fi
 
 
+if python3 - <<'PY'
+import subprocess, sys
+exts = ("*.png", "*.jpg", "*.jpeg", "*.gif", "*.webp", "*.pdf", "*.zip", "*.tar*", "*.dylib", "*.so", "*.a", "*.ipa", "*.tipa", "*.deb", "*.bin", "*.p12", "*.car")
+tracked = set(subprocess.run(["git", "ls-files", *exts], capture_output=True, text=True, check=True).stdout.splitlines())
+allow = {
+    "docs/assets/trollstore-tv-tools-banner.png",
+    "docs/assets/trollstore-tv-tools-social-preview.png",
+}
+unexpected = sorted(tracked - allow)
+if unexpected:
+    print("Unexpected tracked binaries:", unexpected, file=sys.stderr)
+    sys.exit(1)
+PY
+then
+    ok "tracked binary allowlist gate (0 unexpected)"
+else
+    ng "tracked binary allowlist gate"
+fi
+
+gi_ok=1
+for _ig in .env .DS_Store .omp/x .agents/x; do
+    git -c core.excludesFile=/dev/null check-ignore -q "$_ig" || gi_ok=0
+done
+if [ "$gi_ok" -eq 1 ]; then
+    ok ".gitignore self-consistency (core.excludesFile=/dev/null)"
+else
+    ng ".gitignore self-consistency"
+fi
+
 if git ls-files | grep -qE '(Assets\.car|fastPathSign|tsverify|\.ipa|\.tipa)$'; then
     git ls-files | grep -E '(Assets\.car|fastPathSign|tsverify|\.ipa|\.tipa)$' >&2
     ng "tracked binary check"

@@ -1,0 +1,39 @@
+name: Feature Request
+description: Suggest a new feature or improvement for TrollStore TV Tools
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Motivation / Problem
+      description: What workflow or pain point does this solve?
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Component
+      options:
+        - deb2ipa.sh
+        - build-youtube-tvos.sh
+        - repack-ipa.sh
+        - invert-tvos-icon.sh
+        - sign-coretrust.sh / fetch-fastpathsign.sh
+        - stage2-verify.sh / probe
+        - Documentation / CI
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Offline Acceptance Criteria
+      description: How can this be tested offline (e.g., --dry-run, synthetic bundle test in tests/run.sh)?
+    validations:
+      required: true
+  - type: checkboxes
+    id: compliance
+    attributes:
+      label: Compliance Check
+      options:
+        - label: This request does NOT involve bundling third-party proprietary IPAs, artwork, keys, or DRM-decryption code.
+          required: true

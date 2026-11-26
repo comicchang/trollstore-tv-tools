@@ -1,8 +1,59 @@
+# 1. Local Secrets, Env & Runtime Locks
+.env
+.env.local
+.env.*.local
+*.key
+*.p12
+*.mobileprovision
+*credential*.bin
+*.pid
+*.token
+
+# 2. Language Virtualenv, Bytecode & Test/Lint Caches
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# 3. Native / Platform Build Outputs
 build/
+dist/
 Payload/
 vendor/*
 !vendor/README.md
+
+# 4. Large Binaries, Packages & Archives
 *.ipa
 *.tipa
-.DS_Store
+*.deb
+*.ipsw
+*.dmp
+*.ips
+
+# 5. Narrow Runtime Logs & Private Snapshots
+local/
+/work/
 !docs/evidence/*.log
+
+# 6. Temp Files, Backups, OS & Editor Junk
+*.tmp
+*.bak
+*.orig
+*.swp
+*~
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# 7. Local Agent & Tooling Overlays
+/.drafts/
+.agents/
+.claude/
+.codex/
+.dotai/
+.omp/
+.omo/
+.serena/
+.memsearch/
+.code-review-graph/

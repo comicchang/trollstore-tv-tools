@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security Vulnerability Report
+    url: https://github.com/comicchang/trollstore-tv-tools/blob/main/SECURITY.md
+    about: Please report security issues privately per SECURITY.md.
+  - name: On-Device Installer (trollstore-tv)
+    url: https://github.com/comicchang/trollstore-tv
+    about: Issues with TrollStore.app or trollstorehelper on Apple TV 4K (tvOS 17.0).
+  - name: App Packaging Guide (BYOIPA)
+    url: https://github.com/comicchang/trollstore-tv-tools/blob/main/docs/APP-PACKAGING-GUIDE.md
+    about: Step-by-step instructions for .deb-to-.ipa and BYOIPA workflows.
